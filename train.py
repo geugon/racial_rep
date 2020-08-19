@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+
 from keras.layers import Input, Dense
 from keras.models import Model
 from keras.optimizers import Adam
@@ -50,9 +51,11 @@ def parse_data(df):
     return x, y
 
 
-def build_model(nfeats, ncats):
-    input_ = Input(shape=(x.shape[1]), name='input')
-    output_ = Dense(y.shape[1], activation='softmax', name='output')(input_)
+def build_model():
+    #Hard-coded model inputs/output shape
+    input_ = Input(shape=(5,), name='input')
+    output_ = Dense(5, activation='softmax', name='output', 
+                    weights=[np.eye(5), np.zeros(5)])(input_)
     model = Model(input_, output_)
     opt = Adam(learning_rate=0.01)
     model.compile(loss='categorical_crossentropy', optimizer=opt)
@@ -67,13 +70,13 @@ def extract_coef(model):
 
 
 def train():
-    df = load_data(fname)
+    #Several hard-coded values, this is 
+    df = load_data('data.csv')
     x, y = parse_data(df)
 
-    model = build_model(x.shape[0], y.shape[0])
-    model.fit(x,y, batch_size=20, epochs=150)
+    model = build_model()
+    model.fit(x,y, batch_size=20, epochs=30)
     model.save_weights("weights.h5")
-
 
 if __name__ == '__main__':
     train()
